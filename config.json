@@ -1,0 +1,41 @@
+{
+    "mode": "client",
+    "client": {
+        "local_feed": "/dev/video0",
+        "local_audio": ""
+    },
+    "server": {
+        "local_feeds": [
+            "video3",
+            "video3",
+            "video3",
+            "video3",
+            "video3"
+        ],
+        "local_audio": [
+            ""
+        ],
+        "remote_feeds": [
+            ""
+        ],
+        "remote_audio": [
+            ""
+        ],
+        "config_settings": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    "local_feeds": [],
+    "remote_feeds": [],
+    "cameras":[
+        "/dev/video0"
+    ],
+    "streams": [
+        "http://192.168.1.15:8777/video_feed",
+        "http://192.168.1.15:8776/video_feed"
+    ]
+}

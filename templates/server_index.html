@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tyto</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="/static/Tyto_logo_simple.png">
+        <style>
+            body {
+                text-align: center;
+                font-family: 'monospace';
+                background-color: #222222;
+                color:#999999;
+                margin: 0;
+            }
+            /*START OF HEADER*/
+            .navbar {
+                text-align:left;
+                width:100%;
+                height: 37px;
+            }
+            .navbarBuffer {
+                height: 35px;
+                width:100%;
+            }
+            .navbar_logo {
+                display: inline-block;
+                white-space: nowrap;
+                height:35px;
+                width:40px;
+                vertical-align: middle;
+            }
+            .navbar_icon {
+                /*display:inline-block;*/
+                /*white-space:nowrap;*/
+                height:25px;
+                width:25px;
+                vertical-align: middle;
+            }
+            .navbar_links {
+                display: inline-block;
+                height:35px;
+                color:#999999;
+            }
+            .navbar_links a {
+                text-decoration: none;
+                color:#999999;
+                border-bottom: #ffffff;
+                border-bottom-style: solid;
+                border-width: 1px;
+            }
+            .navbar_settings {
+                /*display: inline-block;*/
+                float: right;
+                margin: 5px 15px;
+
+            }
+            .logo {
+                width: 35px;
+                height: 35px;
+                padding: 1px 5px;
+            }
+            /*END OF NAVBAR*/
+
+            .video1 {
+                border-radius: 10px;
+                width: 48%;
+            }
+            .smallvid {
+                position: relative;
+            }
+            .smallvid {
+                margin: 0;
+                padding: 0;
+                display:inline;
+            }
+            .streamContainer {
+                position: relative;
+                display:inline-block;
+                margin:0;
+                padding:0;
+                width: 30%;
+                border-style: solid;
+            }
+            .stream {
+                margin: 0;
+                padding: 0;
+                border-radius: 10px;
+                width: 100%;
+            }
+            .streamBtnDiv {
+                text-align:right;
+            }
+            .streamBtnDiv form{
+                display: inline-block;
+            }
+            .streamBtn {
+                background-color: #BBBBBB;
+                border-radius: 5px;
+            }
+            .streamBtn:hover {
+                background-color: #888888;
+            }
+            footer {
+                position: fixed;
+                bottom: 0;
+                height: 20px;
+                width:100%;
+                background-color: #555555;
+                text-align: left;
+            }
+            .footerBuffer {
+                height:30px;
+                width:100%;
+            }
+            /*Fulscreen button press*/
+            .fullscreen {
+                position: fixed;
+                top:50%;
+                left:50%;
+                transform: translate(-50%,-50%);
+                height:80%;
+                width: 50%;
+                border-style: none;
+                z-index: 1;
+            }
+            /*End Fulscreen button press*/
+            /*view button dropdown*/
+            .dropdown-content{
+                display:none;
+                position:absolute;
+                top:50%;
+                left:50%;
+                transform: translate(-50%,-50%);
+                z-index:1;
+                width: 5em;
+                text-align: center;
+                background-color: bisque;
+                border-radius: 10px;
+            }
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+            .show {display:block;}
+            /*end of view button dropdown*/
+
+            /*Settings Overlay*/
+            #popup-overlay {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.685);
+                width: 100%;
+                height: 100vh;
+                top: 200px;
+                left: 0;
+                z-index: 9998;
+                display: block;
+                overflow-y: hidden;
+                overflow-x: hidden;
+            }
+            .overlay {
+                /* Height & width depends on how you want to reveal the overlay (see JS below) */
+                height: 25em;
+                width: 30em;
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                left: 0;
+                right: 0;
+                top:0;
+                bottom: 0;
+                margin: auto;
+
+                background-color: rgb(0,0,0); /* Black fallback color */
+                background-color: rgba(0,0,0, 0.6); /* Black w/opacity */
+                overflow-x: hidden; /* Disable horizontal scroll */
+                transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+                border-radius:20px;
+            }
+            .overlay .closebtn {
+                position: absolute;
+                top: 10px;
+                right: 45px;
+                font-size: 35px;
+                color:#999999;
+                text-decoration: none;
+            }
+            /*end of settings overlay*/
+        </style>
+    </head>
+    <body> 
+        <!--START OF HEADER-->
+        <div class="navbar">
+            <div class="navbar_logo">
+                <a href="javascript:openNav()"><img class="logo" src="/static/Tyto_logo_simple.png"></a>
+            </div>            
+        </div>
+        <!--END OF HEADER-->
+        <!--START OF STREAMS-->
+        <div>
+            
+            {% for url in video_feeds%}
+            <div class="smallvid">
+                <img class="video1" src="/video_feed?feed={{ loop.index-1 }}">
+            </div>
+            {% endfor %}
+            {% for url in video_feeds%}
+            <div id="streamContainer{{ loop.index }}" class="streamContainer">
+                <div class="streamDiv">
+                    <img class="stream" src="/video_feed?feed={{ loop.index-1 }}">
+                </div>
+                <div class="streamBtnDiv">
+                    <form method="post">
+                        <button name="record{{ loop.index }}" type="submit" class="streamBtn">Record</button>
+                    </form>
+                    <button onclick="showStreamViewDropdown('streamViewDropdown{{ loop.index }}')" class="streamBtn">View</button>
+                    <div id="streamViewDropdown{{ loop.index }}" class="dropdown-content">
+                        <a href="#">link1</a>
+                        <a href="#">link2</a>
+                        <a href="#">link3</a>
+                    </div>
+                    <button onclick="showFullScreen('streamContainer{{ loop.index }}')" class="streamBtn">Full Screen</button>
+                    <button onclick="location.href='/?feed={{ loop.index-1 }}'" class="streamBtn">Page</button>
+                </div>
+            </div>
+            {% endfor %}
+
+
+            <div id="streamContainer" class="streamContainer">
+                <div class="streamDiv">
+                    <img class="stream" src="/static/testingPic.jpg">
+                </div>
+                <div class="streamBtnDiv">
+                    <form method="post">
+                        <button name="record" type="submit" class="streamBtn">Record</button>
+                    </form>
+                    <button onclick="showStreamViewDropdown('streamViewDropdown')" class="streamBtn">View</button>
+                    <div id="streamViewDropdown" class="dropdown-content">
+                        <a href="#">link1</a>
+                        <a href="#">link2</a>
+                        <a href="#">link3</a>
+                    </div>
+                    <button onclick="showFullScreen('streamContainer')" class="streamBtn">Full Screen</button>
+                    <button class="streamBtn">Settings</button>
+                </div>
+            </div>
+            <div class="navbar_settings">
+                <a href="#addCam"><img class="navbar_icon" src="/static/plus_icon.png"></a>
+            </div>
+            <!--<div class="textfields">
+                <h1>FLASK SERVER</h1>
+                <p>HTML flask server for displaying esp-32 streams</p>
+                <form method="POST">
+                    <fieldset>
+                        <legend>Configuration</legend>
+                        <label for="first-name">Enter Your First Name: <input id="first-name" name="first-name" type="text"  /></label>
+                        <label for="last-name">Enter Your Last Name: <input id="last-name" name="last-name" type="text"  /></label>
+                        <label for="email">Enter Your Email: <input id="email" name="email" type="email"  /></label>
+                        <label for="new-password">Create a New Password: <input id="new-password" name="new-password" type="password" pattern="[a-z0-5]{8,}"  /></label>
+                    </fieldset>
+                    <label><input type="submit" id="sub" name="subm" value="submit all"></label>
+                </form>
+                <div class="">
+                    <img src="/static/sample_image.jpg" class="feed">
+                </div>
+                <div>
+                    <img src="/video_feed">
+                </div>
+                <div>
+                    <img src="{{url_for('static', filename='sample_image.jpg')}}" class="feed"/>
+                </div>
+            </div>-->
+        </div>
+
+
+        <div id="myNav" class="overlay">
+            <!-- Button to close the overlay navigation -->
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <!-- Overlay content -->
+            <div class="overlay-content">
+                <h3>Settings</h1>
+                <form method="POST">
+                    <fieldset>
+                        <legend>Add Source</legend>
+                        <label for="new_feed_video">Video: <input id="new_feed_video" name="new_feed_video" type="text"/></label><br>
+                        <label for="new_feed_audio">Audio: <input id="new_feed_audio" name="new_feed_audio" type="text"/></label><br>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Video per Row</legend>
+                        <label for="num_per_row">#/Row: <input id="num_per_row" name="num_per_row" type="text" pattern="[0-9]"/></label><br>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Video Configuration</legend>
+                        <label for="video_width">Width: <input id="video_width" name="video_width" type="text" pattern="[0-9]{1,}"/></label><br>
+                        <label for="video_height">Height: <input id="video_height" name="video_height" type="text" pattern="[0-9]{1,}"/></label><br>
+                    </fieldset>
+                    <fieldset>
+                        <legend>New Password</legend>
+                        <label for="curr_password">Password: <input id="curr_password" name="curr_password" type="password" pattern="[a-z0-5]{8,}"  /></label><br>
+                        <label for="new-password">New Password: <input id="new-password" name="new-password" type="password" pattern="[a-z0-5]{8,}"  /></label><br>
+                        <label for="rnew-password">New Password: <input id="rnew-password" name="rnew-password" type="password" pattern="[a-z0-5]{8,}"  /></label><br>
+                    </fieldset>
+                    <label><input type="submit" id="sub" name="subm" value="submit all"></label>
+                </form>
+            </div>
+        </div>
+
+        <div id="include-content"></div>
+        <div class="footerBuffer"></div>
+        <footer class="footer">
+            {% if isRecording %}
+            {% endif %}
+            <p>is recording</p>
+        </footer>
+        <script>
+
+            /* Open */
+            function openNav() {
+                document.getElementById("myNav").style.display = "block";
+            }
+
+            /* Close */
+            function closeNav() {
+                document.getElementById("myNav").style.display = "none";
+            }
+
+            function showStreamViewDropdown(dropdown) {
+                document.getElementById(dropdown).classList.toggle("show");
+            }
+            function showFullScreen(container) {
+                document.getElementById(container).classList.toggle("fullscreen");
+                console.log("toggled");
+            }
+
+            closeNav();
+            /*fetch('/templates/client_index.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('include-content').innerHTML = html;
+                });*/
+
+        </script>
+    </body>
+</html>

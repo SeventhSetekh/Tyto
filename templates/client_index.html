@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tyto</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="/static/Tyto_logo_simple.png">
+        <style>
+            body {
+                text-align: center;
+                font-family: 'monospace';
+                background-color: #222222;
+                color:#999999;
+                margin: 0;
+            }
+            /*START OF NAVBAR*/
+            .navbar {
+                text-align:left;
+                margin: 0;
+            }
+            .navbar_logo {
+                display: inline-block;
+                white-space: nowrap;
+            }
+            .logo {
+                width: 30px;
+                height: 30px;
+                padding: 1px 5px;
+            }
+            /*END OF NAVBAR*/
+            .main {
+                padding: 20px;
+
+            }
+            .feed {
+                margin:auto;
+            }
+            .video {
+                border-radius: 10px;
+            }
+            .videoFormat {
+                margin: 10px;
+            }
+            input[type="submit"]:disabled {
+                color:#555555;
+                background-color: #111111;
+            }
+            input[type="submit"] {
+                color:#999999;
+                background-color: #444444;
+            }
+            input {
+                border-radius: 10px;
+                height: 1.5em;
+                width: 10em;
+                padding: 0px 10px;
+                display: inline-block;
+            }
+            form {
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body> 
+        <div class="navbar">
+            <div class="navbar_logo">
+                <a href="/streams"><img class="logo" src="/static/Tyto_logo_simple.png"></a>
+            </div>
+        </div>
+        <div class="main">
+            <div class="feed">
+                <img class="video" src="/video_feed?feed={{ video_feed }}"><!--height="80%">--> 
+            </div>
+            <div class="options">
+                <h3>Options</h3>
+                {% if recordOption %}
+                {% if not recording %}
+                <form id="recordingForm" method="POST">
+                    <label for="filename">Filename: <input id="filename" name="filename" type="text"  /></label>
+                    <label><input type="submit" id="startrecording" name="startrecording" value="Start Recording" disabled></label>
+                </form>
+                {% endif %}
+                {% if recording %}
+                <form method="POST">
+                    <label><input type="submit" id="stoprecording" name="stoprecording" value="Stop Recording"></label>
+                </form>
+                {% endif %}
+                {% endif %}
+                <div class="videoFormat">
+                    <form method="GET">
+                        <label><input type="submit" id="default" name="format" value="Default"></label>
+                    </form>
+                    <form method="GET">
+                        <label><input type="submit" id="negative" name="format" value="Negative"></label>
+                    </form>
+                    <form method="GET">
+                        <label><input type="submit" id="gray" name="format" value="Gray"></label>
+                    </form>
+                    <form method="GET">
+                        <label><input type="submit" id="time_stamp" name="time_stamp" value="Time Stamp"></label>
+                    </form>
+                </div>
+                <div>
+                    <p>
+                        {{ statistics }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        
+        <script>
+            const form = document.getElementById("recordForm");
+            const recordBtn = document.getElementById("startrecording");
+            const recordInput = document.getElementById("filename");
+            
+            function checkRecFormValidity() {
+                let allFieldsFilled = true;
+                if (recordInput.value.trim() === '') {
+                    allFieldsFilled = false;
+                }
+                recordBtn.disabled = !allFieldsFilled;
+            }
+            console.log("starting");
+            checkRecFormValidity();
+
+            recordInput.addEventListener('input', checkRecFormValidity);
+        </script>
+    </body>
+</html>
