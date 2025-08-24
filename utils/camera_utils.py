@@ -16,30 +16,53 @@ class Camera:
         self.format = 0
         self.timeStamp = True
         self.is_running = False
-        self.pullFeed()
+        self.frame = np.zeros((480,640,3), dtype=np.uint8)
+        self.start_cam_thread()
+        #self.pullFeed()
 
+    def isOpen(self):
+        return (self.camera.isOpened())
+    
     def pullFeed(self):
         print("pulling feed for camera")
         self.isAttached = False
         while(not self.isAttached):
-            try:
-                self.camera = cv2.VideoCapture(self.infile)
+            #try:
+            self.camera = cv2.VideoCapture(self.infile)
+            
+            self.fps = int(self.camera.get(cv2.CAP_PROP_FPS))
+            self.width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self.height = int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self.brightness = int(self.camera.get(cv2.CAP_PROP_BRIGHTNESS))
+            self.contrast = int(self.camera.get(cv2.CAP_PROP_CONTRAST))
+            self.saturation = int(self.camera.get(cv2.CAP_PROP_SATURATION))
+            self.msec = int(self.camera.get(cv2.CAP_PROP_POS_MSEC))
+            self.count = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
+            
+            print("pull feed loop attached?")
+            status, frame = self.camera.read()
+            print("status: "+str(status))
+            if(status):
+                #self.frame = frame
+                self.isAttached = True
+                self.is_running = True
+                #self.start_cam_thread()
+            else:
+                print("releasing feed")
+                self.camera.release()
+            #print(self.camera.isOpen())
                 
-                self.fps = int(self.camera.get(cv2.CAP_PROP_FPS))
-                self.width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
-                self.height = int(self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                self.brightness = int(self.camera.get(cv2.CAP_PROP_BRIGHTNESS))
-                self.contrast = int(self.camera.get(cv2.CAP_PROP_CONTRAST))
-                self.saturation = int(self.camera.get(cv2.CAP_PROP_SATURATION))
-                self.msec = int(self.camera.get(cv2.CAP_PROP_POS_MSEC))
-                self.count = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
                 
-            except:
-                print("could not pull camera feed")
-                continue
-            self.isAttached = True
-            self.start_cam_thread()
-
+            #except:
+            #    print("could not pull camera feed")
+            time.sleep(1)
+        return True 
+        
+    def releaseFeed(self):
+        print("releasing feed")
+        self.camera.release()
+        return True
+    
     def grab_frame(self):
         while True:
             # Read frame from the camera
@@ -110,7 +133,7 @@ class Camera:
         self._lock = Lock()
         self.cam_thread.daemon = True
         self.cam_thread.start()
-        self.is_running = True
+        self.is_running = False
 
     def camera_thread(self):
         while True:
@@ -119,6 +142,14 @@ class Camera:
                 if status:
                     with self._lock:
                         self.frame = frame
+                else:
+                    print("thread loop no frame")
+                    self.releaseFeed()
+                    self.pullFeed()
+            else:
+                print("thread initiallizing feed")
+                self.pullFeed()
+
     
     def get_image(self):
         with self._lock:
@@ -151,6 +182,21 @@ class Camera:
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
+    def movement_detection_thread(self,time_interval,trigger):
+        frame = self.get_image()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        last_mean = np.abs(np.mean(frame))
+        time.sleep(time_interval)
+        while True:
+            frame = self.get_image()
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            result = np.abs(np.mean(frame) - last_mean)
+            if result > trigger:
+                self.isMovement = True
+            else:
+                self.isMovement = False
+            last_mean = result
+            time.sleep(time_interval)
 
 def returnString(var):
     return(var)

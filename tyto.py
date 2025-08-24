@@ -4,7 +4,7 @@ import json
 import os
 from utils.camera_utils import *
 from utils.system_files import *
-from flask import Flask, Response, request, render_template, redirect
+from flask import Flask, Response, request, render_template, redirect, abort
 
 CONFIG_LOCATION = "/home/seth/Documents/Projects/Tyto/config.json"
 LOG_LOCATION = "/home/seth/Documents/Projects/Tyto/log.txt"
@@ -38,9 +38,10 @@ def video_feed():
             active_feed = int(request.args["feed"])
             print(active_feed)
             print(type(active_feed))
+            if(video_index >= len(feeds)):
+                abort(404)
             return Response(feeds[active_feed].grab_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
             #return Response(feeds[active_feed].grab_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
         except:
             return redirect("/feed_list")
     return redirect("/feed_list")
@@ -84,6 +85,11 @@ def index():
         except:
             print("inproper GET request")
     print(video_index)
+    print("length of feed: "+str(len(feeds)))
+    if(video_index >= len(feeds)):
+        abort(404)
+    print("is it still open?:")
+    print(feeds[video_index].isOpen())
     camStats = str(feeds[video_index].grab_stats())
     if "format" in request.args:
         format = request.args["format"]
