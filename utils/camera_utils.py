@@ -19,9 +19,6 @@ class Camera:
         self.frame = np.zeros((480,640,3), dtype=np.uint8)
         self.start_cam_thread()
         #self.pullFeed()
-
-    def isOpen(self):
-        return (self.camera.isOpened())
     
     def pullFeed(self):
         print("pulling feed for camera")
@@ -46,11 +43,9 @@ class Camera:
                 #self.frame = frame
                 self.isAttached = True
                 self.is_running = True
-                #self.start_cam_thread()
             else:
                 print("releasing feed")
                 self.camera.release()
-            #print(self.camera.isOpen())
                 
                 
             #except:
@@ -110,7 +105,7 @@ class Camera:
         stats.append(self.count)
         
         return (stats)
-    
+    # ALL RECORDING FUNCTIONS
     def startRecord(self, outfile):
         self.outfile = outfile
         if self.recording:
@@ -127,7 +122,29 @@ class Camera:
         if reset_recordInterval:
             self.recordingInterval = 1
 
-
+    def start_recording_thread(self,outfile: str,time_interval=20):
+        self.recording_thread = Thread(target=self.recordFeed,args=(outfile,time_interval))
+        self.recording_thread.daemon = True
+        self.recording_thread.start()
+        return True
+    
+    def stop_recording_thread(self):
+        self.recording = False
+        self.recording_thread.join()
+        return True
+    
+    def recordFeed(self,outfile: str,time_interval: int):
+        interval = time_interval
+        self.startRecord(outfile)
+        while self.recording:
+            if time.time()-self.recordingStartTime >= self.recordingLengths:
+                self.stopRecord(False)
+                self.recordingInterval = self.recordingInterval + 1
+                self.startRecord(str(self.outfile))
+            self.out.write(self.get_image())
+        self.stopRecord()
+    # END OF ALL RECORDING FUNCTIONS
+    # FRAME GRABBING THREAD
     def start_cam_thread(self):
         self.cam_thread = Thread(target=self.camera_thread,args=())
         self._lock = Lock()
@@ -150,7 +167,6 @@ class Camera:
                 print("thread initiallizing feed")
                 self.pullFeed()
 
-    
     def get_image(self):
         with self._lock:
             return self.frame.copy()
@@ -167,13 +183,14 @@ class Camera:
             if self.timeStamp:
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cv2.putText(frame, timestamp, (10,20),cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0),1)
+            '''
             if self.recording:
                 if time.time()-self.recordingStartTime >= self.recordingLengths:
                     self.stopRecord(False)
                     self.recordingInterval = self.recordingInterval + 1
                     self.startRecord(str(self.outfile))
                 self.out.write(frame)
-
+            '''
             # Encode the frame in JPEG format
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -181,6 +198,8 @@ class Camera:
             # Yield the frame in byte form
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    # END OF FRAME GRABBING THREAD
+
 
     def movement_detection_thread(self,time_interval,trigger):
         frame = self.get_image()

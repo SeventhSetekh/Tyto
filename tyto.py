@@ -16,7 +16,6 @@ feeds = []
 log = Log(LOG_LOCATION)
 config = Config(CONFIG_LOCATION)
 config_data = config.read()
-feed_urls = config_data['streams']
 
 #camera = Camera(config_data[config_data["mode"]]["local_feed"])
 #feeds.append(camera)
@@ -89,7 +88,6 @@ def index():
     if(video_index >= len(feeds)):
         abort(404)
     print("is it still open?:")
-    print(feeds[video_index].isOpen())
     camStats = str(feeds[video_index].grab_stats())
     if "format" in request.args:
         format = request.args["format"]
@@ -119,11 +117,11 @@ def index():
     if "startrecording" in request.form:
         print("starting the recording")
         print(request.form["filename"])
-        feeds[video_index].startRecord(str(request.form["filename"]))
+        feeds[video_index].start_recording_thread(str(request.form["filename"]))
         isRecording=True
     if "stoprecording" in request.form:
         print("stopping the recording")
-        feeds[video_index].stopRecord()
+        feeds[video_index].stop_recording_thread()
         isRecording=False
     # Simple webpage with video feed
     print("index accessed")

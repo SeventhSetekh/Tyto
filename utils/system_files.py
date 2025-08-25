@@ -43,3 +43,5 @@ class Config():
         with open(self.file_location,'w') as read_file:
             json.dump(json_data,read_file,indent=4)
         return True
+    
+    

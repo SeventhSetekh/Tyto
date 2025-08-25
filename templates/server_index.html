@@ -200,12 +200,13 @@
         <!--END OF HEADER-->
         <!--START OF STREAMS-->
         <div>
-            
+            <!--
             {% for url in video_feeds%}
             <div class="smallvid">
                 <img class="video1" src="/video_feed?feed={{ loop.index-1 }}">
             </div>
             {% endfor %}
+            -->
             {% for url in video_feeds%}
             <div id="streamContainer{{ loop.index }}" class="streamContainer">
                 <div class="streamDiv">
@@ -217,7 +218,7 @@
                     </form>
                     <button onclick="showStreamViewDropdown('streamViewDropdown{{ loop.index }}')" class="streamBtn">View</button>
                     <div id="streamViewDropdown{{ loop.index }}" class="dropdown-content">
-                        <a href="#">link1</a>
+                        <a href="#">Remove</a>
                         <a href="#">link2</a>
                         <a href="#">link3</a>
                     </div>
