@@ -3,13 +3,14 @@ import time
 import datetime
 import numpy as np
 from threading import Thread, Lock
+import queue
 
 class Camera:
     def __init__(self,
                  source):
         
         self.infile = source
-        self.frameRate = 20
+        self.frameRate = 10
         self.recording = False
         self.outfileExt = ".mp4"
         self.recordingLengths = 20 #in seconds
@@ -17,9 +18,10 @@ class Camera:
         self.format = 0
         self.timeStamp = True
         self.is_running = False
+        self.frameQueue = queue.Queue(maxsize=10)
         self.frame = np.zeros((480,640,3), dtype=np.uint8)
-        self.pullFeed() #used with test.py
-        #self.start_cam_thread() #used with tyto
+        #self.pullFeed() #used with test.py
+        self.start_cam_thread() #used with tyto
         
     
     def pullFeed(self):
@@ -65,8 +67,11 @@ class Camera:
     # OBSOLETE FUNCTION
     #
     # CAMERA_THREAD HAS REPLACED THIS FUNCTIONALITY
-    # however camera_thread leads to slow feed and massive cpu load
-    # camera_thread needs fixing
+    # however camera_thread leads to slow feed and massive cpu load if no framerate is accounted for
+    #
+    # if going to use, modify __init__ to not start camera thread but pull feed instead.
+    #
+    # OBSOLETE FUNCTION
     def grab_frame(self):
         while True:
             # Read frame from the camera
@@ -114,6 +119,7 @@ class Camera:
         stats.append(self.count)
         
         return (stats)
+    
     # ALL RECORDING FUNCTIONS
     def startRecord(self, outfile):
         self.outfile = outfile
@@ -157,8 +163,9 @@ class Camera:
 
 
     # FRAME GRABBING THREAD
-    # this method greatly increase cpu usage and leads to laggy feeds
-    # needs fixing
+    # grab_image method greatly increase cpu usage and leads to laggy feeds if no framrate is enforced
+    # i believe this is due to firefox running that loop at a speed faster than the camera image is pulled.
+    #
     def start_cam_thread(self):
         self.cam_thread = Thread(target=self.camera_thread,args=())
         self._lock = Lock()
@@ -172,6 +179,13 @@ class Camera:
             if self.is_running:
                 status, frame = self.camera.read()
                 if status:
+                    '''
+                    print("itsgood")
+                    if self.frameQueue.full():
+                        print("quque full dropping frame")
+                        self.frameQueue.get()
+                    self.frameQueue.put(frame)
+                    '''
                     with self._lock:
                         self.frame = frame
                 '''
@@ -187,15 +201,22 @@ class Camera:
             #time.sleep(1/self.frameRate)
 
     def get_image(self):
+        '''
+        if not self.frameQueue.empty():
+            return self.frameQueue.get()
+        else:
+            print("queue empty")
+            return np.zeros((480,640,3), dtype=np.uint8)
+        '''
         with self._lock:
             return self.frame.copy()
         
     def grab_image(self):
         while True:
+            time.sleep(1/self.frameRate) #NEEDED OR HUGE CPU LOAD
             # Read frame from the camera
             frame = self.get_image()
             #print("grabbing image")
-            '''
             if self.format == 1:
                 frame = cv2.bitwise_not(frame)
             if self.format == 2:
@@ -203,15 +224,13 @@ class Camera:
             if self.timeStamp:
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cv2.putText(frame, timestamp, (10,20),cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0),1)
-            '''
-            '''
             if self.recording:
                 if time.time()-self.recordingStartTime >= self.recordingLengths:
                     self.stopRecord(False)
                     self.recordingInterval = self.recordingInterval + 1
                     self.startRecord(str(self.outfile))
                 self.out.write(frame)
-            '''
+
             # Encode the frame in JPEG format
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()

@@ -33,7 +33,6 @@ app = Flask(__name__)
 @app.route('/video_feed', methods = ["GET"])
 def video_feed():
     # Streaming response that serves frames to the browser
-    '''
     if "feed" in request.args:
         try:
             active_feed = int(request.args["feed"])
@@ -45,7 +44,6 @@ def video_feed():
             #return Response(feeds[active_feed].grab_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
         except:
             return redirect("/feed_list")
-    '''
     return Response(feeds[0].grab_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route("/stats")
@@ -65,6 +63,7 @@ def feed_list():
 #ALL STREAM VEIW
 @app.route('/streams', methods = ["GET","POST"])
 def streams():
+    #DEBUGGING: print out all form values
     print (request.method)
     if request.is_json:
         print(request.get_json())
@@ -73,7 +72,7 @@ def streams():
     print("index accessed")
     return render_template('server_index.html', video_feeds=feeds)
 
-'''
+
 #INDIVIDUAL STREAM VIEW
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -90,7 +89,7 @@ def index():
     print("length of feed: "+str(len(feeds)))
     if(video_index >= len(feeds)):
         abort(404)
-    print("is it still open?:")
+
     camStats = str(feeds[video_index].grab_stats())
     if "format" in request.args:
         format = request.args["format"]
@@ -111,6 +110,7 @@ def index():
         else:
             feeds[video_index].timeStamp = True    
 
+    #DEBUGGING: print out all form values
     if request.is_json:
         print(request.get_json())
     for values in request.form:
@@ -130,7 +130,7 @@ def index():
     print("index accessed")
     return render_template('client_index.html',recordOption=isRecordable,recording=isRecording,video_feed=video_index,statistics=camStats)
 
-'''
+
 
 if __name__ == '__main__':
     # Run the app on port 80, accessible from any network interface
