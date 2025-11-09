@@ -128,7 +128,7 @@ def index():
         isRecording=False
     # Simple webpage with video feed
     print("index accessed")
-    return render_template('client_index.html',recordOption=isRecordable,recording=isRecording,video_feed=video_index,statistics=camStats)
+    return render_template('single_feed.html',recordOption=isRecordable,recording=isRecording,video_feed=video_index,statistics=camStats)
 
 
 

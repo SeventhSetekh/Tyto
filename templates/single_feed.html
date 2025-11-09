@@ -6,11 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" type="image/x-icon" href="/static/Tyto_logo_simple.png">
         <style>
+            :root{
+                --bg:#222222;
+                --text:#999999;
+            }
             body {
                 text-align: center;
                 font-family: 'monospace';
-                background-color: #222222;
-                color:#999999;
+                background-color: var(--bg);
+                color:var(--text);
                 margin: 0;
             }
             /*START OF NAVBAR*/
@@ -34,9 +38,15 @@
             }
             .feed {
                 margin:auto;
+                width: 100%;
+                
             }
             .video {
                 border-radius: 10px;
+                height: 100%;
+                width: 100%;
+                max-width: 800px;
+                display: inline-block;
             }
             .videoFormat {
                 margin: 10px;
