@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Log In | Tyto</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="/static/Tyto_logo_simple.png">
+        <link rel="stylesheet" href="/templates/login.css">
+        <!--<style>
+            label {
+                display: block;
+            }
+            img {
+                height:100px;
+                width: 100px;
+            }
+            body {
+                margin: 2%;
+                border: 2px solid black;
+                padding: 5%;
+                text-align: center;
+                font-family: 'monospace';
+                background-color: #222222;
+                font-family: monospace;
+            }
+            .greeting {
+                color:#999999;
+            }
+            .login {
+                background-color: #999999;
+                border-radius: 20px;
+                width: 350px;
+                margin:0 auto;
+                margin-top:20px;
+                padding-top:1px;
+
+            }
+            .createaccount {
+                margin-top: 20px;
+            }
+            a {
+                color: #999999;
+            }
+            p {
+                margin-bottom:0px;
+            }
+            .input {
+                border-radius: 20px;
+                margin: 0 0;
+                padding: 2px 15px;
+                width: 75%;
+            }
+            .button {
+                background-color:#111111; 
+                color:#999999;
+                font-size: 12px;
+                margin-top:30px;
+                margin-bottom:12px;
+                border-radius: 20px;
+                width: 85%;
+                height: 40px;
+            }
+        </style>-->
+    </head>
+    <body>
+        <div>
+            <img src="/static/Tyto_logo_simple.png">
+        </div>
+        <div class="greeting">
+            <h1>Tyto</h1>
+            <p>Every Video Feed | Every Protocol</p>
+        </div>
+        <div class="login">
+            <!--<p>Log into Tyto</p>-->
+            <form method="post">
+                <p>User</p>
+                <label for="username"><input class="input" id="username" name="username" type="text"  /></label>
+                <p>Password</p>
+                <label for="password"><input class="input" id="password" name="password" type="password" pattern="[a-z0-5]{8,}"  /></label>
+                <label><input class="button" type="submit" id="sub" name="subm" value="Login"></label>
+            </form>
+        </div>
+        <div class="createaccount">
+            <a href="/templates/createaccount.html">Create Account</a>
+        </div>
+    </body>
+</html>

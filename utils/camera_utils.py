@@ -9,6 +9,7 @@ class Camera:
                  source):
         
         self.infile = source
+        self.frameRate = 20
         self.recording = False
         self.outfileExt = ".mp4"
         self.recordingLengths = 20 #in seconds
@@ -17,15 +18,16 @@ class Camera:
         self.timeStamp = True
         self.is_running = False
         self.frame = np.zeros((480,640,3), dtype=np.uint8)
-        self.start_cam_thread()
-        #self.pullFeed()
+        self.pullFeed() #used with test.py
+        #self.start_cam_thread() #used with tyto
+        
     
     def pullFeed(self):
         print("pulling feed for camera")
         self.isAttached = False
         while(not self.isAttached):
             #try:
-            self.camera = cv2.VideoCapture(self.infile)
+            self.camera = cv2.VideoCapture(self.infile)#, cv2.CAP_FFMPEG)
             
             self.fps = int(self.camera.get(cv2.CAP_PROP_FPS))
             self.width = int(self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -51,6 +53,7 @@ class Camera:
             #except:
             #    print("could not pull camera feed")
             time.sleep(1)
+        print("[!] camera feed attached")
         return True 
         
     def releaseFeed(self):
@@ -58,6 +61,12 @@ class Camera:
         self.camera.release()
         return True
     
+
+    # OBSOLETE FUNCTION
+    #
+    # CAMERA_THREAD HAS REPLACED THIS FUNCTIONALITY
+    # however camera_thread leads to slow feed and massive cpu load
+    # camera_thread needs fixing
     def grab_frame(self):
         while True:
             # Read frame from the camera
@@ -144,13 +153,19 @@ class Camera:
             self.out.write(self.get_image())
         self.stopRecord()
     # END OF ALL RECORDING FUNCTIONS
+
+
+
     # FRAME GRABBING THREAD
+    # this method greatly increase cpu usage and leads to laggy feeds
+    # needs fixing
     def start_cam_thread(self):
         self.cam_thread = Thread(target=self.camera_thread,args=())
         self._lock = Lock()
         self.cam_thread.daemon = True
         self.cam_thread.start()
         self.is_running = False
+        print("camera thread started")
 
     def camera_thread(self):
         while True:
@@ -159,13 +174,17 @@ class Camera:
                 if status:
                     with self._lock:
                         self.frame = frame
+                '''
                 else:
                     print("thread loop no frame")
                     self.releaseFeed()
                     self.pullFeed()
+                '''
             else:
                 print("thread initiallizing feed")
                 self.pullFeed()
+            
+            #time.sleep(1/self.frameRate)
 
     def get_image(self):
         with self._lock:
@@ -175,7 +194,8 @@ class Camera:
         while True:
             # Read frame from the camera
             frame = self.get_image()
-
+            #print("grabbing image")
+            '''
             if self.format == 1:
                 frame = cv2.bitwise_not(frame)
             if self.format == 2:
@@ -183,6 +203,7 @@ class Camera:
             if self.timeStamp:
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cv2.putText(frame, timestamp, (10,20),cv2.FONT_HERSHEY_PLAIN, 1, (0,255,0),1)
+            '''
             '''
             if self.recording:
                 if time.time()-self.recordingStartTime >= self.recordingLengths:
