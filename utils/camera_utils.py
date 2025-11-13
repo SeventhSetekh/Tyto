@@ -5,6 +5,10 @@ import numpy as np
 from threading import Thread, Lock
 import queue
 
+BACKEND = [cv2.CAP_DSHOW, 
+           cv2.CAP_FFMPEG, 
+           cv2.CAP_GSTREAMER, 
+           cv2.CAP_OPENCV_MJPEG]
 class Camera:
     def __init__(self,
                  source,
@@ -217,9 +221,8 @@ class Camera:
     def grab_image(self):
         while True:
             time.sleep(1/self.frameRate) #NEEDED OR HUGE CPU LOAD
-            # Read frame from the camera
+            # Read frame from the thread
             frame = self.get_image()
-            #print("grabbing image")
             if self.format == 1:
                 frame = cv2.bitwise_not(frame)
             if self.format == 2:
