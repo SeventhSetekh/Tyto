@@ -21,8 +21,8 @@ config_data = config.read()
 #feeds.append(camera)
 for i in config_data['cameras']:
     feeds.append(Camera(i))
-#for i in config_data['streams']:
-#    feeds.append(Camera(i))
+for i in config_data['streams']:
+    feeds.append(Camera(i))
 print("printing feeds")
 print(feeds)
 

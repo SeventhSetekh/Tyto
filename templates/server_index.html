@@ -60,6 +60,13 @@
                 height: 35px;
                 padding: 1px 5px;
             }
+            .navButton {
+                background-color: #444444;
+                color:#999999;
+                border-radius: 5px;
+                height: 2em;
+                margin: 0 2px;
+            }
             /*END OF NAVBAR*/
 
             .video1 {
@@ -77,19 +84,20 @@
             .streamContainer {
                 position: relative;
                 display:inline-block;
-                margin:2px;
+                margin:3px;
                 padding:0;
-                width: 100%;
-                max-width: 800px;
+                width: 97%;
+                max-width: 10000px;
                 height: auto;
                 border-style: solid;
-                border-width: 1px;
-                box-shadow: 0 0 10px rgba(212, 212, 212, 0.2);
+                border-width: 2px;
+                border-color: #000000;
+                box-shadow: 0 0 5px rgba(212, 212, 212, 0.486);
             }
             .stream {
                 margin: 0;
                 padding: 0;
-                border-radius: 10px;
+                border-radius: 1px;
                 width: 100%;
             }
             .streamBtnDiv {
@@ -101,6 +109,7 @@
             .streamBtn {
                 background-color: #BBBBBB;
                 border-radius: 5px;
+                height: 2em;
             }
             .streamBtn:hover {
                 background-color: #888888;
@@ -198,7 +207,14 @@
         <div class="navbar">
             <div class="navbar_logo">
                 <a href="javascript:openNav()"><img class="logo" src="/static/Tyto_logo_simple.png"></a>
-            </div>            
+            </div>  
+            <div class="navbar_links">
+                <button class="navButton" onclick="increaseStreamSize()">+</button>
+                <button class="navButton" onclick="decreaseStreamSize()">-</button>
+            </div> 
+            <div class="navbar_settings">
+                <a href="javascript:openNav()"><img class="navbar_icon" src="/static/settings_icon.png"></a>
+            </div>         
         </div>
         <!--END OF HEADER-->
         <!--START OF STREAMS-->
@@ -250,9 +266,32 @@
                     <button class="streamBtn">Settings</button>
                 </div>
             </div>
+
+            <div id="streamContainer" class="streamContainer">
+                <div class="streamDiv">
+                    <img class="stream" src="/static/plus_icon.png">
+                </div>
+                <div class="streamBtnDiv">
+                    <form method="post">
+                        <button name="record" type="submit" class="streamBtn">Record</button>
+                    </form>
+                    <button onclick="showStreamViewDropdown('streamViewDropdown')" class="streamBtn">View</button>
+                    <div id="streamViewDropdown" class="dropdown-content">
+                        <a href="#">link1</a>
+                        <a href="#">link2</a>
+                        <a href="#">link3</a>
+                    </div>
+                    <button onclick="showFullScreen('streamContainer')" class="streamBtn">Full Screen</button>
+                    <button class="streamBtn">Settings</button>
+                </div>
+            </div>
             <div class="navbar_settings">
                 <a href="#addCam"><img class="navbar_icon" src="/static/plus_icon.png"></a>
             </div>
+            <div class="navbar_settings">
+                <a href="#addCam"><img class="navbar_icon" src="/static/plus_icon.png"></a>
+            </div>
+            
             <!--<div class="textfields">
                 <h1>FLASK SERVER</h1>
                 <p>HTML flask server for displaying esp-32 streams</p>
@@ -315,8 +354,8 @@
         <div class="footerBuffer"></div>
         <footer class="footer">
             {% if isRecording %}
+            <p>RECORDING</p>
             {% endif %}
-            <p>is recording</p>
         </footer>
         <script>
 
@@ -337,6 +376,25 @@
                 document.getElementById(container).classList.toggle("fullscreen");
                 console.log("toggled");
             }
+            function increaseStreamSize() {
+                var containers = document.getElementsByClassName("streamContainer");
+                for (var i = 0; i < containers.length; i++) {
+                    var style = window.getComputedStyle(containers[i]);
+                    var width = parseFloat(style.width);
+                    containers[i].style.maxWidth = (width + 50) + "px";
+                }
+            }
+            function decreaseStreamSize() {
+                var containers = document.getElementsByClassName("streamContainer");
+                for (var i = 0; i < containers.length; i++) {
+                    var style = window.getComputedStyle(containers[i]);
+                    var width = parseFloat(style.width);
+                    if (width > 200) {
+                        containers[i].style.maxWidth = (width - 50) + "px";
+                    }
+                }
+            }
+
 
             closeNav();
             /*fetch('/templates/client_index.html')
