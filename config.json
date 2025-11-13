@@ -31,11 +31,28 @@
     },
     "local_feeds": [],
     "remote_feeds": [],
-    "cameras":[
+    "oldcameras":[
         "/dev/video0"
     ],
-    "streams": [
+    "oldstreams": [
         "http://192.168.1.15:8777/video_feed",
         "http://192.168.1.15:8776/video_feed"
-    ]
+    ],
+    "feeds": {
+        "video0": {
+            "name": "Webcam",
+            "source": "/dev/video0",
+            "timestamp": "True"
+        },
+        "0": {
+            "name": "Window Left 1",
+            "source": "http://192.168.1.15:8777/video_feed",
+            "timestamp":"False"
+        },
+        "1": {
+            "name": "Window Left 2",
+            "source": "http://192.168.1.15:8776/video_feed",
+            "timestamp":"False"
+        }
+    }
 }

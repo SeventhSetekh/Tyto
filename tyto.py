@@ -17,15 +17,18 @@ log = Log(LOG_LOCATION)
 config = Config(CONFIG_LOCATION)
 config_data = config.read()
 
+print(config_data)
+
 #camera = Camera(config_data[config_data["mode"]]["local_feed"])
 #feeds.append(camera)
-for i in config_data['cameras']:
-    feeds.append(Camera(i))
-for i in config_data['streams']:
-    feeds.append(Camera(i))
-print("printing feeds")
-print(feeds)
+for i in config_data['feeds']:
+    timestamp = False
+    if config_data['feeds'][i]['timestamp']=="True" or config_data['feeds'][i]['timestamp']=="1":
+        timestamp = True
+    feeds.append(Camera(config_data['feeds'][i]['source'],id=config_data['feeds'][i]['name'],timestamp=timestamp))
 
+#print("printing feeds")
+#print(json.dumps(config_data,indent=4))
 
 
 app = Flask(__name__)
@@ -61,7 +64,7 @@ def feed_list():
 
 
 #ALL STREAM VEIW
-@app.route('/streams', methods = ["GET","POST"])
+@app.route('/', methods = ["GET","POST"])
 def streams():
     #DEBUGGING: print out all form values
     print (request.method)
@@ -70,11 +73,14 @@ def streams():
     print(request.form)
     # Simple webpage with video feed
     print("index accessed")
-    return render_template('server_index.html', video_feeds=feeds)
+    streamNames = []
+    for feed in feeds:
+        streamNames.append(feed.id)
+    return render_template('server_index.html', video_feeds=streamNames)
 
 
 #INDIVIDUAL STREAM VIEW
-@app.route('/', methods=['GET','POST'])
+@app.route('/stream', methods=['GET','POST'])
 def index():
     global isRecording
     global video_index

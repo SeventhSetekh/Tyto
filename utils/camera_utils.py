@@ -7,16 +7,19 @@ import queue
 
 class Camera:
     def __init__(self,
-                 source):
+                 source,
+                 id="0",
+                 timestamp=True):
         
         self.infile = source
+        self.id = id
         self.frameRate = 10
         self.recording = False
         self.outfileExt = ".mp4"
         self.recordingLengths = 20 #in seconds
         self.recordingInterval = 1
         self.format = 0
-        self.timeStamp = True
+        self.timeStamp = timestamp
         self.is_running = False
         self.frameQueue = queue.Queue(maxsize=10)
         self.frame = np.zeros((480,640,3), dtype=np.uint8)
