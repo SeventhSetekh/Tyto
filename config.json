@@ -14,6 +14,11 @@
             "name": "Window Left 2",
             "source": "http://192.168.1.15:8776/video_feed",
             "timestamp":"False"
+        },
+        "2": {
+            "name": "Window Left 2",
+            "source": "rtsp://192.168.1.20:554/media/live/1/2",
+            "timestamp":"False"
         }
     }
 }
